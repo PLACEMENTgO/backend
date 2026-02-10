@@ -12,12 +12,13 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         format_sql: true
 
+#will do this later right now only local testing okay bro
   flyway:
-    enabled: true
+    enabled: false
     baseline-on-migrate: true
