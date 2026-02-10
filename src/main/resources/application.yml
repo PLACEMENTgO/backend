@@ -7,7 +7,7 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/placementgo
-    username: root
+    username: postgres
     password: root
 
   jpa:
@@ -19,6 +19,6 @@ spring:
         format_sql: true
 
 #will do this later right now only local testing okay bro
-#  flyway:
-#    enabled: true
-#    baseline-on-migrate: true
+  flyway:
+    enabled: false
+    baseline-on-migrate: true

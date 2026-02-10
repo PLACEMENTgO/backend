@@ -1,4 +1,4 @@
-package com.placementgo.backend.Resume.model;
+package com.placementgo.backend.resume.model;
 
 public enum ResumeStatus {
     UPLOADED,

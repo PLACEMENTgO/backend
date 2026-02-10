@@ -1,4 +1,4 @@
-package com.placementgo.backend.Resume.util;
+package com.placementgo.backend.resume.util;
 
 import org.springframework.web.multipart.MultipartFile;
 

@@ -1,9 +1,9 @@
-package com.placementgo.backend.Resume.service;
+package com.placementgo.backend.resume.service;
 
 
-import com.placementgo.backend.Resume.model.Resume;
-import com.placementgo.backend.Resume.model.ResumeStatus;
-import com.placementgo.backend.Resume.repository.ResumeRepository;
+import com.placementgo.backend.resume.model.Resume;
+import com.placementgo.backend.resume.model.ResumeStatus;
+import com.placementgo.backend.resume.repository.ResumeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
