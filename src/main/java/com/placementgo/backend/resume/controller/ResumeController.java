@@ -35,13 +35,14 @@ public class ResumeController {
     public ResponseEntity<GenerateResumeResponse> uploadAndGenerate(
             @RequestParam("file") MultipartFile file,
             @RequestParam("jobDescription") String jobDescription,
+            @RequestParam(value = "template", defaultValue = "classic") String template,
             Authentication authentication
     ) throws Exception {
 
         UUID userId = (UUID) authentication.getPrincipal();
 
         GenerateResumeResponse response =
-                resumeService.uploadAndGenerate(userId, file, jobDescription);
+                resumeService.uploadAndGenerate(userId, file, jobDescription, template);
 
         return ResponseEntity.ok(response);
     }

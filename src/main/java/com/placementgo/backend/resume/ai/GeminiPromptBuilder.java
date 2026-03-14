@@ -17,9 +17,14 @@ public class GeminiPromptBuilder {
         }
     }
 
-    public String buildLatexPrompt(String parsedResumeJson, String jobDescription) {
+    public String buildLatexPrompt(String parsedResumeJson, String jobDescription, String templateId) {
 
-        String mainTex = loadFile("tempDir/main.tex");
+        String templateFile = switch (templateId == null ? "classic" : templateId.toLowerCase()) {
+            case "modern"  -> "tempDir/modern.tex";
+            case "compact" -> "tempDir/compact.tex";
+            default        -> "tempDir/main.tex";
+        };
+        String mainTex = loadFile(templateFile);
 
         return """
 You are a STRICT LaTeX content editor.
