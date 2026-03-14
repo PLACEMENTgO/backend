@@ -33,7 +33,8 @@ public class ResumeService {
     public GenerateResumeResponse uploadAndGenerate(
             UUID userId,
             MultipartFile file,
-            String jobDescription
+            String jobDescription,
+            String templateId
     ) throws Exception {
 
         log.info("🚀 Starting resume upload + generation pipeline for user: {}", userId);
@@ -78,7 +79,8 @@ public class ResumeService {
                 // 1️⃣ Generate LaTeX
                 latexContent = aiResumeGenerator.generateOptimizedJson(
                         parsedJson,
-                        jobDescription
+                        jobDescription,
+                        templateId
                 );
 
                 log.info("🤖 AI returned LaTeX (length: {})", latexContent.length());

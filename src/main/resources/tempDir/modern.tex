@@ -1,0 +1,156 @@
+%--- Modern Blue Resume Template ---
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{textcomp}
+
+\definecolor{accent-blue}{RGB}{37,99,235}
+\definecolor{dark-grey}{gray}{0.3}
+\definecolor{text-grey}{gray}{.08}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\setlength{\footskip}{10pt}
+
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{0in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.5in}
+\addtolength{\textheight}{1.0in}
+
+\urlstyle{same}
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+\titleformat{\section}{
+  \color{accent-blue}\bfseries \vspace{2pt} \raggedright \large
+}{}{0em}{}[\color{accent-blue} {\titlerule[2pt]} \vspace{-4pt}]
+
+\newcommand{\resumeItem}[1]{
+  \item\small{{#1 \vspace{-1pt}}}
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-1pt}\item
+    \begin{tabular*}{\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & {\color{dark-grey}\small #2} \\
+      \textit{#3} & {\color{dark-grey}\small #4} \\
+    \end{tabular*}\vspace{-4pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+  \item
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+      #1 & {\color{dark-grey} #2} \\
+    \end{tabular*}\vspace{-4pt}
+}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0in,label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{0pt}}
+
+\color{text-grey}
+
+%-------------------------------------------
+\begin{document}
+
+%----------HEADING----------
+\begin{center}
+    \textbf{\Huge\color{accent-blue} Harshibar} \\ \vspace{5pt}
+    \small
+    Phone: \texttt{555.555.5555} \hspace{6pt} | \hspace{6pt}
+    Email: \href{mailto:hello@email.com}{\texttt{hello@email.com}} \hspace{6pt} | \hspace{6pt}
+    YouTube: \href{https://youtube.com/@harshibar}{\texttt{@harshibar}} \hspace{6pt} | \hspace{6pt}
+    Location: U.S. Citizen
+\end{center}
+
+%-----------EXPERIENCE-----------
+\section{EXPERIENCE}
+\resumeSubHeadingListStart
+
+\resumeSubheading
+{YouTube}{Aug. 2019 -- Present}
+{Creator}{San Francisco, CA}
+\resumeItemListStart
+\resumeItem{Grew channel to \textbf{60k subscribers} in 1.5 years; created 80+ videos on tech and productivity}
+\resumeItem{Conducted A/B testing on titles and thumbnails; increased video impressions by \textbf{2.5M} in 3 months}
+\resumeItem{Partnered with brands like Skillshare and Squarespace for sponsorship collaborations}
+\resumeItemListEnd
+
+\resumeSubheading
+{Google Verily}{Aug. 2018 -- Sept. 2019}
+{Software Engineer}{San Francisco, CA}
+\resumeItemListStart
+\resumeItem{Led front-end development of a dashboard processing 50k blood samples for early cancer detection}
+\resumeItem{Rebuilt a Quality Control product with 20 cross-functional stakeholders, saving \$1M annually}
+\resumeItem{Spearheaded development of a new lab workflow tool, increasing efficiency by 40\%}
+\resumeItemListEnd
+
+\resumeSubheading
+{Amazon}{May 2017 -- Aug. 2017}
+{Software Engineering Intern}{Seattle, WA}
+\resumeItemListStart
+\resumeItem{Worked on Search Customer Experience Team; received a full-time return offer}
+\resumeItem{Shipped a new feature to 2M+ users improving search for movie series queries}
+\resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+%-----------PROJECTS-----------
+\section{PROJECTS}
+\resumeSubHeadingListStart
+
+\resumeProjectHeading{\textbf{CommonIntern}}{Sept. 2019 -- May 2020}
+\resumeItemListStart
+\resumeItem{Built Python automation tool using BeautifulSoup and Selenium for job applications}
+\resumeItem{Achieved 500 GitHub stars; featured on Hackaday and Reddit communities}
+\resumeItemListEnd
+
+\resumeProjectHeading{\textbf{Minimal Icon Pack}}{Sept. 2020 -- Nov. 2020}
+\resumeItemListStart
+\resumeItem{Designed and released 100+ minimal iOS and Android icons using Procreate and Figma}
+\resumeItem{Generated \$250+ in sales through YouTube marketing and Gumroad distribution}
+\resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+%-----------EDUCATION-----------
+\section{EDUCATION}
+\resumeSubHeadingListStart
+
+\resumeSubheading
+{Wellesley College}{Aug. 2014 -- May 2018}
+{Bachelor of Arts in Computer Science and Pre-Med}{Wellesley, MA}
+\resumeItemListStart
+\resumeItem{\textbf{Coursework}: Data Structures, Algorithms, Databases, Computer Systems, Machine Learning}
+\resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+%-----------SKILLS-----------
+\section{SKILLS}
+\begin{itemize}[leftmargin=0in,label={}]
+\small{
+\item{
+\textbf{Languages}: Python, JavaScript (React.js), HTML/CSS, SQL \\
+\textbf{Tools}: Figma, Notion, Jira, GitHub, Google Analytics, DaVinci Resolve
+}}
+\end{itemize}
+
+\end{document}

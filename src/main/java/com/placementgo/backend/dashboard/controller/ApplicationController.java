@@ -3,6 +3,7 @@ package com.placementgo.backend.dashboard.controller;
 import com.placementgo.backend.dashboard.dto.*;
 import com.placementgo.backend.dashboard.service.ApplicationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,9 +16,8 @@ public class ApplicationController {
 
     private final ApplicationService applicationService;
 
-    // Replace later with actual JWT extraction
     private UUID getLoggedInUserId() {
-        return UUID.fromString("11111111-1111-1111-1111-111111111111");
+        return (UUID) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
     @PostMapping
