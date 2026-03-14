@@ -1,0 +1,153 @@
+%--- Compact Minimal Resume Template ---
+\documentclass[letterpaper,10.5pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{textcomp}
+
+\definecolor{dark-grey}{gray}{0.2}
+\definecolor{text-grey}{gray}{.08}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\setlength{\footskip}{10pt}
+
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{0in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.5in}
+\addtolength{\textheight}{1.0in}
+
+\urlstyle{same}
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+\titleformat{\section}{
+  \bfseries \vspace{4pt} \raggedright \normalsize\uppercase
+}{}{0em}{}[\vspace{-6pt}\rule{\textwidth}{0.4pt}\vspace{-2pt}]
+
+\newcommand{\resumeItem}[1]{
+  \item\small{{#1 \vspace{-2pt}}}
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & {\color{dark-grey}\small #2} \\
+      \textit{\small #3} & {\color{dark-grey}\small #4} \\
+    \end{tabular*}\vspace{-5pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+  \item
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+      #1 & {\color{dark-grey}\small #2} \\
+    \end{tabular*}\vspace{-5pt}
+}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0in,label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}[leftmargin=*]}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{0pt}}
+
+\color{text-grey}
+
+%-------------------------------------------
+\begin{document}
+
+%----------HEADING----------
+\begin{center}
+    {\Huge\bfseries Harshibar} \\ \vspace{3pt}
+    \small
+    \texttt{555.555.5555} ~|~
+    \href{mailto:hello@email.com}{\texttt{hello@email.com}} ~|~
+    \href{https://youtube.com/@harshibar}{\texttt{@harshibar}} ~|~
+    U.S. Citizen
+\end{center}
+
+\vspace{-4pt}
+
+%-----------EXPERIENCE-----------
+\section{Experience}
+\resumeSubHeadingListStart
+
+\resumeSubheading
+{YouTube}{Aug. 2019 -- Present}
+{Creator}{San Francisco, CA}
+\resumeItemListStart
+\resumeItem{Grew channel to \textbf{60k subscribers} in 1.5 years; created 80+ videos on tech and productivity}
+\resumeItem{Conducted A/B testing; increased video impressions by \textbf{2.5M} in 3 months}
+\resumeItem{Partnered with Skillshare and Squarespace for sponsorship collaborations}
+\resumeItemListEnd
+
+\resumeSubheading
+{Google Verily}{Aug. 2018 -- Sept. 2019}
+{Software Engineer}{San Francisco, CA}
+\resumeItemListStart
+\resumeItem{Led front-end of dashboard processing 50k blood samples for early cancer detection}
+\resumeItem{Rebuilt QC product with 20 stakeholders, saving \$1M annually}
+\resumeItem{Spearheaded lab workflow tool, increasing efficiency by 40\%}
+\resumeItemListEnd
+
+\resumeSubheading
+{Amazon}{May 2017 -- Aug. 2017}
+{Software Engineering Intern}{Seattle, WA}
+\resumeItemListStart
+\resumeItem{Shipped feature to 2M+ users; received full-time return offer}
+\resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+%-----------PROJECTS-----------
+\section{Projects}
+\resumeSubHeadingListStart
+
+\resumeProjectHeading{\textbf{CommonIntern}}{2019 -- 2020}
+\resumeItemListStart
+\resumeItem{Python automation tool; 500 GitHub stars; featured on Hackaday and Reddit}
+\resumeItemListEnd
+
+\resumeProjectHeading{\textbf{Minimal Icon Pack}}{2020}
+\resumeItemListStart
+\resumeItem{100+ iOS/Android icons; \$250+ in sales via Gumroad}
+\resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+%-----------EDUCATION-----------
+\section{Education}
+\resumeSubHeadingListStart
+
+\resumeSubheading
+{Wellesley College}{2014 -- 2018}
+{B.A. Computer Science and Pre-Med}{Wellesley, MA}
+\resumeItemListStart
+\resumeItem{Coursework: Data Structures, Algorithms, Databases, Machine Learning}
+\resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+%-----------SKILLS-----------
+\section{Skills}
+\begin{itemize}[leftmargin=0in,label={}]
+\small{\item{
+\textbf{Languages}: Python, JavaScript, HTML/CSS, SQL \\
+\textbf{Tools}: Figma, Notion, GitHub, Google Analytics
+}}
+\end{itemize}
+
+\end{document}
