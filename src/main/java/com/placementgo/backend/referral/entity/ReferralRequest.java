@@ -1,14 +1,18 @@
 package com.placementgo.backend.referral.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import org.hibernate.annotations.CreationTimestamp;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Data
+@Table(name = "referral_requests")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ReferralRequest {
 
     @Id
@@ -17,14 +21,17 @@ public class ReferralRequest {
 
     private UUID userId;
 
-    private UUID resumeId;
-
-    @Column(length = 5000)
+    @Column(columnDefinition = "TEXT")
     private String jobDescription;
 
-    @Column(unique = true)
-    private String shareToken;
+    private String company;
 
-    @CreationTimestamp
+    private String role;
+
+    private String linkedinSearchLink;
+
+    private String token;
+
     private Instant createdAt;
+
 }

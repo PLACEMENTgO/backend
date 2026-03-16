@@ -2,26 +2,31 @@ package com.placementgo.backend.referral.entity;
 
 import com.placementgo.backend.referral.enums.TemplateType;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.util.UUID;
 
 @Entity
-@Data
+@Table(name = "referral_templates")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ReferralTemplate {
 
     @Id
     @GeneratedValue
     private UUID id;
 
-    @ManyToOne
-    private ReferralRequest referralRequest;
+    private UUID referralId;
 
     @Enumerated(EnumType.STRING)
     private TemplateType type;
 
-    @Column(length = 2000)
+    @Column(columnDefinition = "TEXT")
     private String message;
 
     private int version;
+
 }

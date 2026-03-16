@@ -10,6 +10,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/referrals")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", allowedHeaders = "*") // Allow all origins for development
 public class ReferralController {
 
     private final ReferralService referralService;

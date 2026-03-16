@@ -8,9 +8,16 @@ import com.placementgo.backend.referral.entity.ReferralTemplate;
 import com.placementgo.backend.referral.enums.TemplateType;
 import com.placementgo.backend.referral.repository.ReferralRequestRepository;
 import com.placementgo.backend.referral.repository.ReferralTemplateRepository;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.*;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -19,60 +26,131 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ReferralService {
 
-    private final ReferralRequestRepository requestRepo;
-    private final ReferralTemplateRepository templateRepo;
-    private final LinkedInLinkService linkedIn;
+    private final ReferralRequestRepository referralRepository;
+    private final ReferralTemplateRepository templateRepository;
+    private final LinkedInLinkService linkedInLinkService;
 
-    public CreateReferralResponse createReferral(UUID userId, CreateReferralRequest req) {
+    private static final String BASE_SHARE_URL = "http://localhost:8080/r/";
 
-        String token = UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    public CreateReferralResponse createReferral(UUID userId, CreateReferralRequest request) {
 
-        ReferralRequest r = new ReferralRequest();
-        r.setUserId(userId);
-        r.setResumeId(req.getResumeId());
-        r.setJobDescription(req.getJobDescription());
-        r.setShareToken(token);
-        requestRepo.save(r);
+        String company = "Company";
+        String role = "Software Engineer";
 
-        templateRepo.save(createTemplate(r, TemplateType.REFERRAL, "Referral message"));
-        templateRepo.save(createTemplate(r, TemplateType.CONNECTION, "Connection message"));
+        String linkedinLink = linkedInLinkService.generateSearchLink(company, role);
+
+        String token = UUID.randomUUID().toString().substring(0, 8);
+
+        ReferralRequest referral = ReferralRequest.builder()
+                .userId(userId)
+                .jobDescription(request.getJobDescription())
+                .company(company)
+                .role(role)
+                .linkedinSearchLink(linkedinLink)
+                .token(token)
+                .createdAt(Instant.now())
+                .build();
+
+        referralRepository.save(referral);
+
+        List<ReferralTemplate> templates = generateTemplates(referral.getId(), company, role);
+
+        templateRepository.saveAll(templates);
+
+        Map<String, String> templateMap = new HashMap<>();
+
+        for (ReferralTemplate t : templates) {
+            templateMap.put(t.getType().name(), t.getMessage());
+        }
 
         return CreateReferralResponse.builder()
-                .referralId(r.getId())
-                .shareLink("https://placementgo.in/r/" + token)
-                .linkedinSearchLink(linkedIn.generate(req.getJobDescription()))
-                .templates(Map.of(
-                        "REFERRAL", "Referral message",
-                        "CONNECTION", "Connection message"
-                ))
+                .referralId(referral.getId())
+                .shareLink(BASE_SHARE_URL + token)
+                .linkedinSearchLink(linkedinLink)
+                .templates(templateMap)
                 .build();
     }
 
-    private ReferralTemplate createTemplate(ReferralRequest r, TemplateType t, String msg) {
-        ReferralTemplate rt = new ReferralTemplate();
-        rt.setReferralRequest(r);
-        rt.setType(t);
-        rt.setMessage(msg);
-        rt.setVersion(1);
-        return rt;
+    private List<ReferralTemplate> generateTemplates(UUID referralId, String company, String role) {
+
+        List<ReferralTemplate> list = new ArrayList<>();
+
+        list.add(
+                ReferralTemplate.builder()
+                        .referralId(referralId)
+                        .type(TemplateType.SHORT)
+                        .message("Hi, I saw you're at " + company + ". Could you refer me for " + role + "?")
+                        .version(1)
+                        .build()
+        );
+
+        list.add(
+                ReferralTemplate.builder()
+                        .referralId(referralId)
+                        .type(TemplateType.PROFESSIONAL)
+                        .message("Hello, I noticed you work at " + company + ". I’m applying for the " + role + " role and would appreciate a referral.")
+                        .version(1)
+                        .build()
+        );
+
+        list.add(
+                ReferralTemplate.builder()
+                        .referralId(referralId)
+                        .type(TemplateType.CASUAL)
+                        .message("Hey! I'm applying for " + role + " at " + company + ". Would love a referral if possible.")
+                        .version(1)
+                        .build()
+        );
+
+        return list;
     }
 
     public List<ReferralSummaryResponse> getAll(UUID userId) {
-        return requestRepo.findByUserIdOrderByCreatedAtDesc(userId)
-                .stream()
-                .map(r -> ReferralSummaryResponse.builder()
-                        .id(r.getId())
-                        .shareLink("https://placementgo.in/r/" + r.getShareToken())
-                        .createdAt(r.getCreatedAt())
-                        .build())
-                .toList();
+
+        List<ReferralRequest> referrals = referralRepository.findByUserId(userId);
+
+        List<ReferralSummaryResponse> responses = new ArrayList<>();
+
+        for (ReferralRequest r : referrals) {
+
+            responses.add(
+                    ReferralSummaryResponse.builder()
+                            .referralId(r.getId())
+                            .shareLink(BASE_SHARE_URL + r.getToken())
+                            .createdAt(r.getCreatedAt())
+                            .build()
+            );
+        }
+
+        return responses;
     }
 
-    public ReferralRequest getById(UUID id) {
-        return requestRepo.findById(id).orElseThrow();
+    public CreateReferralResponse getById(UUID id) {
+
+        ReferralRequest referral = referralRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Referral not found"));
+
+        List<ReferralTemplate> templates = templateRepository.findByReferralId(id);
+
+        Map<String, String> templateMap = new HashMap<>();
+
+        for (ReferralTemplate t : templates) {
+            templateMap.put(t.getType().name(), t.getMessage());
+        }
+
+        return CreateReferralResponse.builder()
+                .referralId(referral.getId())
+                .shareLink(BASE_SHARE_URL + referral.getToken())
+                .linkedinSearchLink(referral.getLinkedinSearchLink())
+                .templates(templateMap)
+                .build();
     }
 
-    public ReferralRequest getByToken(String token) {
-        return requestRepo.findByShareToken(token).orElseThrow();
+    public Object getByToken(String token) {
+
+        ReferralRequest referral = referralRepository.findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid referral token"));
+
+        return referral.getLinkedinSearchLink();
     }
 }

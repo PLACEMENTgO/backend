@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ReferralRequestRepository
-        extends JpaRepository<ReferralRequest, UUID> {
+public interface ReferralRequestRepository extends JpaRepository<ReferralRequest, UUID> {
 
-    List<ReferralRequest> findByUserIdOrderByCreatedAtDesc(UUID userId);
+    List<ReferralRequest> findByUserId(UUID userId);
 
-    Optional<ReferralRequest> findByShareToken(String token);
+    Optional<ReferralRequest> findByToken(String token);
+
 }

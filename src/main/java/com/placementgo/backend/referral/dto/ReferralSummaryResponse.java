@@ -9,7 +9,11 @@ import java.util.UUID;
 @Data
 @Builder
 public class ReferralSummaryResponse {
-    private UUID id;
+
+    private UUID referralId;
+
     private String shareLink;
+
     private Instant createdAt;
+
 }
