@@ -19,12 +19,13 @@ public class GeminiAiResumeGenerator implements AiResumeGenerator {
     }
 
     @Override
-    public String generateOptimizedJson(String parsedResumeJson, String jobDescription) {
+    public String generateOptimizedJson(String parsedResumeJson, String jobDescription, String templateId) {
 
         // Build prompt
         String prompt = promptBuilder.buildLatexPrompt(
                 parsedResumeJson,
-                jobDescription
+                jobDescription,
+                templateId
         );
 
         // Call Gemini
