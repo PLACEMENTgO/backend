@@ -19,4 +19,5 @@ public class ApplicationResponse {
     private LocalDate appliedDate;
     private ApplicationStatus status;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

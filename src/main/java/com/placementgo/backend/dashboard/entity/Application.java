@@ -1,8 +1,12 @@
 package com.placementgo.backend.dashboard.entity;
 
-
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,16 +14,18 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "applications")
-@Getter
-@Setter
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Application {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    @Column(nullable = false)
+    private UUID userId;
 
     @Column(nullable = false)
     private String company;
@@ -29,27 +35,17 @@ public class Application {
 
     private String jobLink;
 
-    @Column(nullable = false)
     private LocalDate appliedDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ApplicationStatus status;
+    @Builder.Default
+    private ApplicationStatus status = ApplicationStatus.APPLIED;
 
-    @Column(nullable = false)
-    private UUID userId;
-
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-    @PrePersist
-    public void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    public void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
 }
