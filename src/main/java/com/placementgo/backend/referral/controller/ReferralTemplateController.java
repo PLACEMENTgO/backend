@@ -9,6 +9,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/referrals/{id}/templates")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ReferralTemplateController {
 
     private final ReferralTemplateService service;

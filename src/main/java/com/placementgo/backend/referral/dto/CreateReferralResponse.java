@@ -9,13 +9,10 @@ import java.util.UUID;
 @Data
 @Builder
 public class CreateReferralResponse {
-
     private UUID referralId;
-
     private String shareLink;
-
     private String linkedinSearchLink;
-
-    private Map<String,String> templates;
-
+    private Map<String, String> templates;
+    private String company;  // ✅ Add this
+    private String role;     // ✅ Add this
 }
