@@ -90,7 +90,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/placementgo
     username: postgres
-    password: 1234
+    password: <your_password>
 
   jpa:
     hibernate:
