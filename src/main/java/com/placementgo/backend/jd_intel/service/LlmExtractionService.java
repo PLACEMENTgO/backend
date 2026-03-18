@@ -1,7 +1,7 @@
 package com.placementgo.backend.jd_intel.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.placementgo.backend.jd_intel.ai.GeminiClient;
+import com.placementgo.backend.resume.ai.GeminiClient;
 import com.placementgo.backend.jd_intel.dto.JdAnalysisResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +17,7 @@ public class LlmExtractionService {
 
     public JdAnalysisResponse extractInsights(String aggregatedText, String company, String role,
             String jobDescription) {
+
         log.info("Sending text to Gemini for extraction...");
 
         String prompt = createPrompt(aggregatedText, company, role, jobDescription);
@@ -28,6 +29,8 @@ public class LlmExtractionService {
                 log.warn("Received empty response from Gemini.");
                 return JdAnalysisResponse.builder().build();
             }
+
+            log.info("Gemini RAW response:\n{}", content);
 
             // Cleanup Markdown code blocks if present
             content = content.trim();

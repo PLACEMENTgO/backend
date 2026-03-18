@@ -12,8 +12,7 @@ public class GeminiAiResumeGenerator implements AiResumeGenerator {
 
     public GeminiAiResumeGenerator(
             GeminiClient geminiClient,
-            GeminiPromptBuilder promptBuilder
-    ) {
+            GeminiPromptBuilder promptBuilder) {
         this.geminiClient = geminiClient;
         this.promptBuilder = promptBuilder;
     }
@@ -25,8 +24,7 @@ public class GeminiAiResumeGenerator implements AiResumeGenerator {
         String prompt = promptBuilder.buildLatexPrompt(
                 parsedResumeJson,
                 jobDescription,
-                templateId
-        );
+                templateId);
 
         // Call Gemini
         String aiResponse = geminiClient.generateContent(prompt);
@@ -34,13 +32,13 @@ public class GeminiAiResumeGenerator implements AiResumeGenerator {
         if (aiResponse == null || aiResponse.isBlank()) {
             // Instead of throwing error, return fallback JSON
             return """
-            {
-              "optimized_resume": {},
-              "gap_analysis": {
-                "overall_alignment_assessment": "AI did not return content."
-              }
-            }
-            """;
+                    {
+                      "optimized_resume": {},
+                      "gap_analysis": {
+                        "overall_alignment_assessment": "AI did not return content."
+                      }
+                    }
+                    """;
         }
 
         String cleaned = aiResponse.trim();

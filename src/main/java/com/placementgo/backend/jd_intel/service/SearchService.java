@@ -8,8 +8,10 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -19,9 +21,6 @@ public class SearchService {
     @Value("${jd-intel.search-api-key}")
     private String apiKey;
 
-    @Value("${jd-intel.search-engine-id}")
-    private String searchEngineId;
-
     private final RestTemplate restTemplate = new RestTemplate();
 
     public List<String> search(String query) {
@@ -29,28 +28,47 @@ public class SearchService {
 
         if (apiKey == null || apiKey.isEmpty()) {
             log.warn("Search API Key is missing. Returning empty results.");
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
-        String url = UriComponentsBuilder.fromHttpUrl("https://customsearch.googleapis.com/customsearch/v1")
-                .queryParam("key", apiKey)
-                .queryParam("cx", searchEngineId)
+        String url = UriComponentsBuilder.fromUriString("https://serpapi.com/search.json")
+                .queryParam("engine", "google")
                 .queryParam("q", query)
+                .queryParam("location", "Austin, Texas, United States")
+                .queryParam("google_domain", "google.com")
+                .queryParam("hl", "en")
+                .queryParam("gl", "us")
+                .queryParam("api_key", apiKey)
                 .toUriString();
 
         try {
-            Map<String, Object> response = restTemplate.getForObject(url, Map.class);
-            List<Map<String, Object>> items = (List<Map<String, Object>>) response.get("items");
+            Map<?, ?> response = restTemplate.getForObject(url, Map.class);
+            if (response == null) {
+                return Collections.emptyList();
+            }
 
-            if (items == null)
-                return new ArrayList<>();
+            // SerpApi returns organic_results
+            Object hitsObj = response.get("organic_results");
+            List<?> hitsRaw = null;
+            if (!(hitsObj instanceof List<?>)) {
+                // fallback to old-style items key
+                hitsObj = response.get("items");
+                if (!(hitsObj instanceof List<?>)) {
+                    return Collections.emptyList();
+                }
+            }
 
-            return items.stream()
-                    .map(item -> (String) item.get("link"))
-                    .toList();
+            return hitsRaw.stream()
+                    .filter(hit -> hit instanceof Map<?, ?>)
+                    .map(hit -> (Map<?, ?>) hit)
+                    .map(itemMap -> itemMap.get("link"))
+                    .filter(link -> link instanceof String)
+                    .map(link -> (String) link)
+                    .collect(Collectors.toList());
+
         } catch (Exception e) {
-            log.error("Error during search: {}", e.getMessage());
-            return new ArrayList<>();
+            log.error("Error during search: {}", e.getMessage(), e);
+            return Collections.emptyList();
         }
     }
 }

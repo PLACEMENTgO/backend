@@ -1,11 +1,16 @@
 package com.placementgo.backend.jd_intel.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 @Data
 @Builder
+@NoArgsConstructor // ✅ REQUIRED
+@AllArgsConstructor // ✅ recommended
 public class JdAnalysisResponse {
     private String company;
     private String role;

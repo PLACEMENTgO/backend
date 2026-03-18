@@ -27,8 +27,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+            FilterChain filterChain) throws ServletException, IOException {
+
+        String path = request.getRequestURI();
+
+        if (path.contains("swagger") || path.contains("api-docs")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         // ✅ 1️⃣ Allow CORS preflight requests immediately
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
@@ -48,8 +54,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 var auth = new UsernamePasswordAuthenticationToken(
                         userId,
                         null,
-                        List.of()
-                );
+                        List.of());
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
