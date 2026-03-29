@@ -1,5 +1,6 @@
 package com.placementgo.backend.jd_intel.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.placementgo.backend.jd_intel.ai.GeminiClient;
 import com.placementgo.backend.jd_intel.dto.JdAnalysisResponse;
@@ -13,7 +14,8 @@ import org.springframework.stereotype.Service;
 public class LlmExtractionService {
 
     private final GeminiClient geminiClient;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     public JdAnalysisResponse extractInsights(String aggregatedText, String company, String role,
             String jobDescription) {
@@ -80,7 +82,12 @@ public class LlmExtractionService {
         sb.append("  \"predictedRounds\": [\"Round 1: OA\", \"Round 2: DSA\"],\n");
         sb.append("  \"difficultyLevel\": \"Easy/Medium/Hard\",\n");
         sb.append("  \"rejectionReasons\": [\"reason 1\"],\n");
-        sb.append("  \"companyTips\": [\"tip 1\"]\n");
+        sb.append("  \"companyTips\": [\"tip 1\"],\n");
+        sb.append("  \"sourceSummary\": \"A brief 1-2 sentence summary of the analysis sources and key findings\",\n");
+        sb.append("  \"confidenceScore\": \"85\",\n");
+        sb.append("  \"focusAreas\": [\"Data Structures\", \"System Design\", \"Behavioral\"],\n");
+        sb.append("  \"evaluationCriteria\": [{\"name\": \"Technical Skills\", \"percentage\": 40}, {\"name\": \"Problem Solving\", \"percentage\": 30}],\n");
+        sb.append("  \"preparationChecklist\": [{\"priority\": 1, \"title\": \"Master DSA\", \"description\": \"Practice top problems\"}, {\"priority\": 2, \"title\": \"System Design\", \"description\": \"Study distributed systems\"}]\n");
         sb.append("}\n");
 
         return sb.toString();

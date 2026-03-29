@@ -10,15 +10,15 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 
 @Slf4j
-@Component
-public class GeminiClient {
+@Component("ResumeGroqClient")
+public class GroqClient {
 
     private final WebClient webClient;
     private final ObjectMapper mapper = new ObjectMapper();
-    private final GeminiProperties props;
+    private final GroqProperties props;
     private final GroqRateLimiter rateLimiter;
 
-    public GeminiClient(GeminiProperties props, GroqRateLimiter rateLimiter) {
+    public GroqClient(GroqProperties props, GroqRateLimiter rateLimiter) {
         this.props = props;
         this.rateLimiter = rateLimiter;
         this.webClient = WebClient.builder()
@@ -60,14 +60,14 @@ public class GeminiClient {
                             clientResponse -> {
                                 log.error("❌ Groq returned HTTP error: {}", clientResponse.statusCode());
                                 return clientResponse.bodyToMono(String.class)
-                                        .map(body -> new RuntimeException("Gemini API call failed: " + body));
+                                        .map(body -> new RuntimeException("Groq API call failed: " + body));
                             }
                     )
                     .bodyToMono(JsonNode.class)
                     .block();
 
             if (response == null) {
-                throw new RuntimeException("Gemini API call failed");
+                throw new RuntimeException("Groq API call failed");
             }
 
             log.info("📥 Groq response received");
@@ -81,9 +81,9 @@ public class GeminiClient {
 
         } catch (Exception e) {
 
-            log.error("❌ Gemini API exception:", e);
+            log.error("❌ Groq API exception:", e);
 
-            throw new RuntimeException("Gemini API call failed", e);
+            throw new RuntimeException("Groq API call failed", e);
         }
     }
 

@@ -28,9 +28,19 @@ public class Resume {
     @Enumerated(EnumType.STRING)
     private ResumeStatus status;
 
-    @Lob
     @Column(columnDefinition = "TEXT")
     private String parsedJson;
+
+    @Column(columnDefinition = "TEXT")
+    private String jobDescription;
+
+    private String templateName;
+
+    @Column(columnDefinition = "TEXT")
+    private String generatedLatex;
+
+    @Column(columnDefinition = "TEXT")
+    private String generatedPdfBase64;
 
     private LocalDateTime createdAt;
 }

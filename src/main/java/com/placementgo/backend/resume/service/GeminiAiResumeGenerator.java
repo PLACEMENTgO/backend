@@ -1,20 +1,21 @@
 package com.placementgo.backend.resume.service;
 
-import com.placementgo.backend.resume.ai.GeminiClient;
+import com.placementgo.backend.resume.ai.GroqClient;
 import com.placementgo.backend.resume.ai.GeminiPromptBuilder;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
 public class GeminiAiResumeGenerator implements AiResumeGenerator {
 
-    private final GeminiClient geminiClient;
+    private final GroqClient groqClient;
     private final GeminiPromptBuilder promptBuilder;
 
     public GeminiAiResumeGenerator(
-            GeminiClient geminiClient,
+            @Qualifier("ResumeGroqClient") GroqClient groqClient,
             GeminiPromptBuilder promptBuilder
     ) {
-        this.geminiClient = geminiClient;
+        this.groqClient = groqClient;
         this.promptBuilder = promptBuilder;
     }
 
@@ -29,7 +30,7 @@ public class GeminiAiResumeGenerator implements AiResumeGenerator {
         );
 
         // Call Gemini
-        String aiResponse = geminiClient.generateContent(prompt);
+        String aiResponse = groqClient.generateContent(prompt);
 
         if (aiResponse == null || aiResponse.isBlank()) {
             // Instead of throwing error, return fallback JSON

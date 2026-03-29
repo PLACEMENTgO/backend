@@ -4,8 +4,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "gemini")
-public class GeminiProperties {
+@ConfigurationProperties(prefix = "resume.groq")
+public class GroqProperties {
 
     private String apiKey;
     private String model;

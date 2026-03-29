@@ -1,6 +1,7 @@
 package com.placementgo.backend.resume.service;
 
 import com.placementgo.backend.resume.dto.GenerateResumeResponse;
+import com.placementgo.backend.resume.dto.ResumeSummaryResponse;
 import com.placementgo.backend.resume.model.Resume;
 import com.placementgo.backend.resume.model.ResumeStatus;
 import com.placementgo.backend.resume.repository.ResumeRepository;
@@ -19,6 +20,7 @@ import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -169,10 +171,20 @@ public class ResumeService {
 
         if (base64Pdf == null) {
             log.error("❌ All {} attempts failed. Giving up.", maxRetries);
+            resume.setStatus(ResumeStatus.FAILED);
+            resumeRepository.save(resume);
             throw new RuntimeException(
                     "AI resume generation failed after " + maxRetries + " attempts."
             );
         }
+
+        // ✅ Persist the generated output back to the resume record
+        resume.setJobDescription(jobDescription);
+        resume.setTemplateName(templateId);
+        resume.setGeneratedLatex(latexContent);
+        resume.setGeneratedPdfBase64(base64Pdf);
+        resume.setStatus(ResumeStatus.PDF_GENERATED);
+        resumeRepository.save(resume);
 
         log.info("🎉 Resume generation pipeline completed successfully.");
 
@@ -217,6 +229,18 @@ public class ResumeService {
                 body = aiLatex.trim();
             }
 
+            // Strip preamble-only commands the AI sometimes mistakenly places inside the body.
+            // documentclass, usepackage, and newcommand belong in the preamble only.
+            body = body.replaceAll("(?m)^\\s*\\\\documentclass[^\\n]*\\n?", "");
+            body = body.replaceAll("(?m)^\\s*\\\\usepackage[^\\n]*\\n?", "");
+            body = body.replaceAll("(?m)^\\s*\\\\newcommand[^\\n]*\\n?", "");
+            body = body.replaceAll("(?m)^\\s*\\\\renewcommand[^\\n]*\\n?", "");
+            body = body.replaceAll("(?m)^\\s*\\\\definecolor[^\\n]*\\n?", "");
+            body = body.replaceAll("(?m)^\\s*\\\\pagestyle[^\\n]*\\n?", "");
+            // Ensure \resumeSubheading always has 4 argument groups — AI sometimes omits Location
+            body = fixSubheadingArgs(body);
+            body = body.trim();
+
             return preamble + "\n" + body + "\n\\end{document}";
 
         } catch (Exception e) {
@@ -225,8 +249,57 @@ public class ResumeService {
         }
     }
 
+    /**
+     * Scans body for every \resumeSubheading call and ensures it has exactly 4 brace-argument groups.
+     * If the AI omits the 4th arg (Location), TeX grabs the following token as arg4, causing
+     * "Extra }, or forgotten \endgroup" crashes at the next \resumeItemListStart.
+     */
+    private String fixSubheadingArgs(String body) {
+        final String MACRO = "\\resumeSubheading";
+        StringBuilder sb = new StringBuilder();
+        int idx = 0;
+        while (idx < body.length()) {
+            int cmdIdx = body.indexOf(MACRO, idx);
+            if (cmdIdx == -1) {
+                sb.append(body, idx, body.length());
+                break;
+            }
+            sb.append(body, idx, cmdIdx + MACRO.length());
+            int pos = cmdIdx + MACRO.length();
+            int argsFound = 0;
+            while (argsFound < 4) {
+                // Skip whitespace between arguments
+                int ws = pos;
+                while (ws < body.length() && Character.isWhitespace(body.charAt(ws))) ws++;
+                if (ws >= body.length() || body.charAt(ws) != '{') break;
+                // Extract the balanced brace group
+                int depth = 0, groupEnd = -1;
+                for (int i = ws; i < body.length(); i++) {
+                    char c = body.charAt(i);
+                    if (c == '{') depth++;
+                    else if (c == '}' && --depth == 0) { groupEnd = i; break; }
+                }
+                if (groupEnd == -1) break; // unbalanced — leave untouched
+                sb.append(body, ws, groupEnd + 1);
+                pos = groupEnd + 1;
+                argsFound++;
+            }
+            // Pad any missing arguments with empty groups
+            while (argsFound < 4) { sb.append("{}"); argsFound++; }
+            idx = pos;
+        }
+        return sb.toString();
+    }
+
     public Resume getResumeById(UUID resumeId) {
         return resumeRepository.findById(resumeId)
                 .orElseThrow(() -> new RuntimeException("Resume not found"));
+    }
+
+    public List<ResumeSummaryResponse> getUserResumes(UUID userId) {
+        return resumeRepository.findGeneratedByUserIdOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(ResumeSummaryResponse::new)
+                .toList();
     }
 }

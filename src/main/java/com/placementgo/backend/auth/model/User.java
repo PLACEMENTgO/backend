@@ -19,13 +19,24 @@ public class User {
     private String email;
 
     @Setter
-    @Column(nullable = false)
+    @Column // nullable for Google OAuth users
     private String passwordHash;
+
+    @Setter
+    private String name;
+
+    @Setter
+    @Column(length = 500)
+    private String profilePicture;
+
+    @Setter
+    @Column(nullable = false)
+    private String authProvider = "LOCAL"; // LOCAL or GOOGLE
 
     @Column(nullable = false)
     private Instant createdAt = Instant.now();
 
-    // getters & setters
+    // getters
 
     public UUID getId() {
         return id;
@@ -37,6 +48,18 @@ public class User {
 
     public String getPasswordHash() {
         return passwordHash;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public String getAuthProvider() {
+        return authProvider;
     }
 
     public Instant getCreatedAt() {

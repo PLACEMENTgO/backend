@@ -1,30 +1,48 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 spring:
   application:
     name: placementgo-backend
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/placementgo
-    username: postgres
-    password: root
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/placementgo}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:root}
 
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: ${JPA_DDL_AUTO:update}
+    show-sql: false
 
     properties:
       hibernate:
         format_sql: true
 
 jd-intel:
-  search-api-key: ${SEARCH_API_KEY:your-serp-api-key-here}
-  search-engine-id: ${SEARCH_ENGINE_ID:your-search-engine-id-here}
+  search-api-key: ${SEARCH_API_KEY:}
+  search-engine-id: ${SEARCH_ENGINE_ID:}
+  gemini:
+    api-key: ${GEMINI_API_KEY:}
+    base-url: https://generativelanguage.googleapis.com/v1beta
+    model: gemini-2.5-flash
 
 gemini:
-  api-key: AIzaSyDNmiJip-8i1lN-bqDRiZFBsOcdjoaIR9U
+  api-key: ${GEMINI_API_KEY:}
   base-url: https://generativelanguage.googleapis.com/v1beta
   model: gemini-2.5-flash
   temperature: 0.2
+
+cors:
+  allowed-origins: ${ALLOWED_ORIGINS:http://localhost:3000}
+
+google:
+  oauth:
+    client-id: ${GOOGLE_OAUTH_CLIENT_ID:}
+
+resume:
+  groq:
+    api-key: ${GROQ_API_KEY:}
+    base-url: https://api.groq.com/openai/v1
+    model: llama-3.3-70b-versatile
+    temperature: 0.2
