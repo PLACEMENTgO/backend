@@ -23,8 +23,14 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
-            echo "==> Freeing build cache..."
-            docker builder prune -f > /dev/null 2>&1 || true
+            echo "==> Checking disk space..."
+            DISK_USED=$(df / | awk 'NR==2{gsub(/%/,"",$5); print $5}')
+            echo "Disk used: ${DISK_USED}%"
+            if [ "$DISK_USED" -gt 70 ]; then
+              echo "Disk above 70%, running aggressive prune..."
+              docker builder prune -f
+              docker image prune -f
+            fi
 
             echo "==> Rebuilding backend container..."
             cd ~/app
