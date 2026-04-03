@@ -6,7 +6,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -51,10 +54,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (jwtUtil.validate(token)) {
                 UUID userId = jwtUtil.extractUserId(token);
 
+                // 🔥 FIX: UserDetails object banao, sirf UUID nahi
+                UserDetails userDetails = User.builder()
+                        .username(userId.toString())  // userId ko username mein store karo
+                        .password("")  // Empty password (not needed for JWT)
+                        .authorities(List.of(new SimpleGrantedAuthority("ROLE_USER")))
+                        .build();
+
                 var auth = new UsernamePasswordAuthenticationToken(
-                        userId,
+                        userDetails,  // ✅ UserDetails object pass karo
                         null,
-                        List.of());
+                        userDetails.getAuthorities());
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }

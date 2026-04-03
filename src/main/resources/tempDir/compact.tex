@@ -2,7 +2,6 @@
 \documentclass[letterpaper,10.5pt]{article}
 
 \usepackage{latexsym}
-\usepackage[empty]{fullpage}
 \usepackage{titlesec}
 \usepackage[usenames,dvipsnames]{color}
 \usepackage{verbatim}
@@ -25,11 +24,9 @@
 \renewcommand{\footrulewidth}{0pt}
 \setlength{\footskip}{10pt}
 
-\addtolength{\oddsidemargin}{-0.5in}
-\addtolength{\evensidemargin}{0in}
-\addtolength{\textwidth}{1in}
-\addtolength{\topmargin}{-.5in}
-\addtolength{\textheight}{1.0in}
+% Margins — tight single-page layout
+\usepackage[letterpaper, top=0.35in, bottom=0.35in, left=0.45in, right=0.45in]{geometry}
+\setlength{\footskip}{10pt}
 
 \urlstyle{same}
 \raggedbottom

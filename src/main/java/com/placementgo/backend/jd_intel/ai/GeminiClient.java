@@ -16,11 +16,11 @@ public class GeminiClient {
     private final WebClient webClient;
     private final ObjectMapper mapper = new ObjectMapper();
 
-    @Value("${gemini.model:gemini-2.5-flash}")
+    @Value("${jd-intel.gemini.model:gemini-2.5-flash}")
     private String model;
 
-    public GeminiClient(@Value("${gemini.base-url:https://generativelanguage.googleapis.com/v1beta}") String baseUrl,
-            @Value("${gemini.api-key}") String apiKey) {
+    public GeminiClient(@Value("${jd-intel.gemini.base-url:https://generativelanguage.googleapis.com/v1beta}") String baseUrl,
+            @Value("${jd-intel.gemini.api-key}") String apiKey) {
         this.webClient = WebClient.builder()
                 .baseUrl(baseUrl)
                 .defaultHeader("x-goog-api-key", apiKey)

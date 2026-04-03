@@ -38,4 +38,15 @@ public class UserService {
 
         return user;
     }
+
+    public boolean existsByEmail(String email) {
+        return repo.existsByEmail(email);
+    }
+
+    public void updatePassword(String email, String newPassword) {
+        User user = repo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setPasswordHash(encoder.encode(newPassword));
+        repo.save(user);
+    }
 }

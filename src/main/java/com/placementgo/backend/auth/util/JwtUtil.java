@@ -48,4 +48,36 @@ public class JwtUtil {
             return false;
         }
     }
+
+    // ── Password reset tokens (15 min expiry) ────────────────────────────────
+
+    private static final long RESET_EXPIRY_SECONDS = 15 * 60;
+
+    public String generatePasswordResetToken(String email) {
+        return Jwts.builder()
+                .setSubject(email)
+                .claim("type", "password-reset")
+                .setIssuedAt(new Date())
+                .setExpiration(Date.from(Instant.now().plusSeconds(RESET_EXPIRY_SECONDS)))
+                .signWith(KEY, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String validatePasswordResetToken(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(KEY)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            if (!"password-reset".equals(claims.get("type"))) {
+                throw new RuntimeException("Invalid token type");
+            }
+            return claims.getSubject(); // email
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid or expired reset token");
+        }
+    }
 }

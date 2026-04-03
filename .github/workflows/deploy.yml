@@ -1,0 +1,40 @@
+name: Deploy Backend to EC2
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.repository == 'PLACEMENTgO/backend'
+
+    steps:
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            echo "==> Pulling latest backend code..."
+            cd ~/app/backend
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "==> Checking disk space..."
+            DISK_USED=$(df / | awk 'NR==2{gsub(/%/,"",$5); print $5}')
+            echo "Disk used: ${DISK_USED}%"
+            if [ "$DISK_USED" -gt 70 ]; then
+              echo "Disk above 70%, running aggressive prune..."
+              docker builder prune -f
+              docker image prune -f
+            fi
+
+            echo "==> Rebuilding backend container..."
+            cd ~/app
+            docker compose up -d --build --no-deps backend
+
+            echo "==> Done. Backend deployed."
+            docker ps --format "table {{.Names}}\t{{.Status}}"
