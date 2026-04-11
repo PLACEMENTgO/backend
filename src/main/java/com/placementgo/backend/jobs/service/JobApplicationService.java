@@ -2,6 +2,9 @@ package com.placementgo.backend.jobs.service;
 
 import com.placementgo.backend.auth.model.User;
 import com.placementgo.backend.auth.repository.UserRepository;
+import com.placementgo.backend.dashboard.entity.Application;
+import com.placementgo.backend.dashboard.entity.ApplicationStatus;
+import com.placementgo.backend.dashboard.repository.ApplicationRepository;
 import com.placementgo.backend.jobs.dto.ApplyRequest;
 import com.placementgo.backend.jobs.dto.ApplyResponse;
 import com.placementgo.backend.jobs.dto.JobDto;
@@ -14,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,6 +29,7 @@ public class JobApplicationService {
     private final JobApplicationRepository jobApplicationRepository;
     private final JobPostingRepository jobPostingRepository;
     private final UserRepository userRepository;
+    private final ApplicationRepository applicationRepository;
 
     @Transactional
     public ApplyResponse apply(User user, ApplyRequest request) {
@@ -81,6 +86,7 @@ public class JobApplicationService {
         if (jobPosting.isInternal()) {
             application.setStatus("APPLIED");
             jobApplicationRepository.save(application);
+            syncToDashboard(user.getId(), jobPosting, "APPLIED");
             return ApplyResponse.builder()
                     .success(true)
                     .message("Successfully applied to internal job.")
@@ -89,6 +95,7 @@ public class JobApplicationService {
         } else {
             application.setStatus("REDIRECTED");
             jobApplicationRepository.save(application);
+            syncToDashboard(user.getId(), jobPosting, "APPLIED");
             return ApplyResponse.builder()
                     .success(true)
                     .message("Redirecting to external platform. Chrome extension will assist with Auto-Apply.")
@@ -98,4 +105,25 @@ public class JobApplicationService {
                     .build();
         }
     }
-}
+
+    /**
+     * Mirrors a premium job application into the dashboard applications table so
+     * the tracker updates automatically without the user doing anything extra.
+     */
+    private void syncToDashboard(UUID userId, JobPosting jobPosting, String statusStr) {
+        boolean alreadySynced = applicationRepository
+                .existsByUserIdAndJobLinkAndRole(userId, jobPosting.getApplyUrl(), jobPosting.getTitle());
+        if (alreadySynced) return;
+
+        Application dashApp = Application.builder()
+                .userId(userId)
+                .company(jobPosting.getCompanyName())
+                .role(jobPosting.getTitle())
+                .jobLink(jobPosting.getApplyUrl())
+                .appliedDate(LocalDate.now())
+                .status(ApplicationStatus.APPLIED)
+                .build();
+        applicationRepository.save(dashApp);
+        log.info("Synced premium job application to dashboard for user {}: {} @ {}",
+                userId, jobPosting.getTitle(), jobPosting.getCompanyName());
+    }
