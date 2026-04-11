@@ -127,3 +127,4 @@ public class JobApplicationService {
         log.info("Synced premium job application to dashboard for user {}: {} @ {}",
                 userId, jobPosting.getTitle(), jobPosting.getCompanyName());
     }
+}
