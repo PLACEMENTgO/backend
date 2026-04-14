@@ -139,21 +139,18 @@ public class AutoApplyOrchestrator {
                     continue;
                 }
 
-                // AI scoring — if no parsed resume, skip threshold check and show all jobs
+                // AI scoring — best-effort only, never filters out jobs
                 int score = 50;
                 List<String> reasons = List.of();
                 if (parsedResumeJson != null) {
-                    JobMatchingService.MatchResult match =
-                            matchingService.score(parsedResumeJson, raw.title(), raw.description());
-                    score = match.score();
-                    reasons = match.reasons();
-
-                    if (score < config.getMinAiMatchScore()) {
-                        log.debug("Skipping '{}' at '{}' – score {} below threshold {}", raw.title(), raw.company(), score, config.getMinAiMatchScore());
-                        continue;
+                    try {
+                        JobMatchingService.MatchResult match =
+                                matchingService.score(parsedResumeJson, raw.title(), raw.description());
+                        score = match.score();
+                        reasons = match.reasons();
+                    } catch (Exception e) {
+                        log.warn("AI scoring failed for '{}', defaulting to 50: {}", raw.title(), e.getMessage());
                     }
-                } else {
-                    log.debug("No parsed resume for user {}, skipping AI threshold filter", userId);
                 }
 
                 // Generate application template
