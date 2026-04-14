@@ -16,12 +16,22 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          envs: JSEARCH_API_KEY,ADZUNA_APP_ID,ADZUNA_APP_KEY
           script: |
             set -e
             echo "==> Pulling latest backend code..."
             cd ~/app/backend
             git fetch origin main
             git reset --hard origin/main
+
+            echo "==> Injecting new API keys into .env..."
+            cd ~/app
+            grep -qxF "JSEARCH_API_KEY=${JSEARCH_API_KEY}" .env || echo "JSEARCH_API_KEY=${JSEARCH_API_KEY}" >> .env
+            grep -qxF "ADZUNA_APP_ID=${ADZUNA_APP_ID}" .env || echo "ADZUNA_APP_ID=${ADZUNA_APP_ID}" >> .env
+            grep -qxF "ADZUNA_APP_KEY=${ADZUNA_APP_KEY}" .env || echo "ADZUNA_APP_KEY=${ADZUNA_APP_KEY}" >> .env
+            sed -i "s|^JSEARCH_API_KEY=.*|JSEARCH_API_KEY=${JSEARCH_API_KEY}|" .env
+            sed -i "s|^ADZUNA_APP_ID=.*|ADZUNA_APP_ID=${ADZUNA_APP_ID}|" .env
+            sed -i "s|^ADZUNA_APP_KEY=.*|ADZUNA_APP_KEY=${ADZUNA_APP_KEY}|" .env
 
             echo "==> Checking disk space..."
             DISK_USED=$(df / | awk 'NR==2{gsub(/%/,"",$5); print $5}')
