@@ -229,6 +229,16 @@ public class AutoApplyOrchestrator {
                     Map.of("total", discovered, "autoApplied", autoApplied, "manualRequired", manualRequired));
         }
 
+        // Always fire SCAN_COMPLETE so the frontend can clear the "Scanning…" banner,
+        // even when 0 jobs are found or SSE missed the JOB_FOUND event.
+        notificationService.push(userId, "SCAN_COMPLETE",
+                discovered > 0 ? "Scan complete" : "Scan complete – no new jobs found",
+                discovered > 0
+                        ? discovered + " match" + (discovered == 1 ? "" : "es") + " found, "
+                                + manualRequired + " need your review."
+                        : "No new jobs matched your preferences. Try broadening your job titles or locations.",
+                Map.of("total", discovered, "autoApplied", autoApplied, "manualRequired", manualRequired));
+
         return new int[]{discovered, autoApplied, manualRequired};
     }
 
