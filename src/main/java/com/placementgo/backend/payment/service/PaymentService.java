@@ -26,7 +26,7 @@ import java.util.UUID;
 @Slf4j
 public class PaymentService {
 
-    private static final int AMOUNT_PAISE = 49900; // ₹499
+    private static final int AMOUNT_PAISE = 1900; // $19 in cents
     private static final int VALIDITY_DAYS = 30;
 
     @Value("${razorpay.key-id}")
@@ -47,7 +47,7 @@ public class PaymentService {
 
         JSONObject orderRequest = new JSONObject();
         orderRequest.put("amount", AMOUNT_PAISE);
-        orderRequest.put("currency", "INR");
+        orderRequest.put("currency", "USD");
         orderRequest.put("receipt", "sub_" + userId.toString().substring(0, 8));
         orderRequest.put("payment_capture", true);
 

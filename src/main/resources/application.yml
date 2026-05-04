@@ -51,7 +51,7 @@ cors:
 
 google:
   oauth:
-    client-id: ${GOOGLE_OAUTH_CLIENT_ID:}
+    client-id: ${GOOGLE_OAUTH_CLIENT_ID:262199465580-4bcsh38dfh20gjglln9ofvgl43dvi4mm.apps.googleusercontent.com}
 
 app:
   base-url: ${APP_BASE_URL:https://placementgo.in}
