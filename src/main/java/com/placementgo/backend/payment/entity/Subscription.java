@@ -41,7 +41,7 @@ public class Subscription {
     @Builder.Default
     private String status = "PENDING"; // PENDING | ACTIVE | FAILED | EXPIRED
 
-    /** Amount in cents (e.g. 1900 = $19) */
+    /** Amount in cents (e.g. 100 = $1) */
     private Integer amountPaise;
 
     private Instant activatedAt;

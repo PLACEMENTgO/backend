@@ -26,7 +26,7 @@ import java.util.UUID;
 @Slf4j
 public class PaymentService {
 
-    private static final int AMOUNT_PAISE = 1900; // $19 in cents
+    private static final int AMOUNT_PAISE = 100; // $1 in cents
     private static final int VALIDITY_DAYS = 30;
 
     @Value("${razorpay.key-id}")
@@ -68,7 +68,7 @@ public class PaymentService {
         return CreateOrderResponse.builder()
                 .orderId(orderId)
                 .amountPaise(AMOUNT_PAISE)
-                .currency("INR")
+                .currency("USD")
                 .keyId(keyId)
                 .planName("PlacementGO PRO")
                 .description("30-day Premium Access — Unlimited Job Auto-Apply")

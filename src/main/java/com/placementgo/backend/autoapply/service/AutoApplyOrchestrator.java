@@ -15,6 +15,8 @@ import com.placementgo.backend.auth.model.User;
 import com.placementgo.backend.auth.repository.UserRepository;
 import com.placementgo.backend.resume.model.Resume;
 import com.placementgo.backend.resume.repository.ResumeRepository;
+import com.placementgo.backend.payment.repository.SubscriptionRepository;
+import com.placementgo.backend.payment.entity.Subscription;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -51,6 +53,7 @@ public class AutoApplyOrchestrator {
     private final ResumeRepository resumeRepo;
     private final ApplicationRepository applicationRepository;
     private final UserRepository userRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
     private final JobDiscoveryService discoveryService;
     private final JobMatchingService matchingService;
@@ -120,6 +123,12 @@ public class AutoApplyOrchestrator {
         String pdfBase64 = resumeOpt.map(Resume::getGeneratedPdfBase64).orElse(null);
         String resumeFileName = resumeOpt.map(r -> sanitizeFilename(r.getOriginalFileName())).orElse("resume.pdf");
 
+        // Check if user is premium
+        boolean isPremium = subscriptionRepository.findTopByUserIdOrderByCreatedAtDesc(userId)
+                .filter(sub -> "ACTIVE".equals(sub.getStatus()))
+                .filter(sub -> sub.getExpiresAt() != null && sub.getExpiresAt().isAfter(java.time.Instant.now()))
+                .isPresent();
+
         // Discover jobs for each target title × location combination
         for (String title : config.getTargetJobTitles()) {
             String location = config.getPreferredLocations().isEmpty()
@@ -127,6 +136,13 @@ public class AutoApplyOrchestrator {
                     : config.getPreferredLocations().get(0);
 
             List<JobDiscoveryService.RawJobLead> rawLeads = discoveryService.discover(title, location);
+            
+            // Limit to 2 jobs for free users
+            if (!isPremium && rawLeads.size() > 2) {
+                rawLeads = rawLeads.subList(0, 2);
+                log.info("Limited job discovery to 2 for free user {}", userId);
+            }
+            
             discovered += rawLeads.size();
 
             for (JobDiscoveryService.RawJobLead raw : rawLeads) {
