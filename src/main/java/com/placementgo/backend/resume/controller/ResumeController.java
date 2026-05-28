@@ -1,5 +1,6 @@
 package com.placementgo.backend.resume.controller;
 
+import com.placementgo.backend.payment.service.UsageService;
 import com.placementgo.backend.resume.dto.GenerateResumeResponse;
 import com.placementgo.backend.resume.dto.ResumeDetailResponse;
 import com.placementgo.backend.resume.dto.ResumeSummaryResponse;
@@ -24,6 +25,7 @@ import java.util.UUID;
 public class ResumeController {
 
     private final ResumeService resumeService;
+    private final UsageService usageService;
 
     @PostMapping(
             value = "/upload",
@@ -38,6 +40,11 @@ public class ResumeController {
     ) throws Exception {
 
         UUID userId = (UUID) authentication.getPrincipal();
+
+        // Check if user can generate resume (tier limit check)
+        if (!usageService.canGenerateResume(userId)) {
+            return ResponseEntity.status(429).build(); // 429 Too Many Requests
+        }
 
         GenerateResumeResponse response =
                 resumeService.uploadAndGenerate(userId, file, jobDescription, template);

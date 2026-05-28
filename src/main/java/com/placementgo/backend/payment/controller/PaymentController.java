@@ -2,8 +2,10 @@ package com.placementgo.backend.payment.controller;
 
 import com.placementgo.backend.payment.dto.CreateOrderResponse;
 import com.placementgo.backend.payment.dto.SubscriptionStatusResponse;
+import com.placementgo.backend.payment.dto.TierLimitsResponse;
 import com.placementgo.backend.payment.dto.VerifyPaymentRequest;
 import com.placementgo.backend.payment.service.PaymentService;
+import com.placementgo.backend.payment.service.UsageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +21,16 @@ import java.util.UUID;
 public class PaymentController {
 
     private final PaymentService paymentService;
+    private final UsageService usageService;
 
-    /** Create a new Razorpay order for PRO subscription */
+    /** Create a new Razorpay order for subscription (PRO or ENTERPRISE) */
     @PostMapping("/create-order")
     public ResponseEntity<CreateOrderResponse> createOrder(
-            @AuthenticationPrincipal UUID userId) {
+            @AuthenticationPrincipal UUID userId,
+            @RequestParam(defaultValue = "PRO") String plan) {
         try {
-            log.info("Creating payment order for user: {}", userId);
-            CreateOrderResponse response = paymentService.createOrder(userId);
+            log.info("Creating payment order for user: {} with plan: {}", userId, plan);
+            CreateOrderResponse response = paymentService.createOrder(userId, plan);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Failed to create payment order for user {}: {}", userId, e.getMessage(), e);
@@ -57,5 +61,12 @@ public class PaymentController {
     public ResponseEntity<SubscriptionStatusResponse> status(
             @AuthenticationPrincipal UUID userId) {
         return ResponseEntity.ok(paymentService.getStatus(userId));
+    }
+
+    /** Get tier limits and current usage */
+    @GetMapping("/limits")
+    public ResponseEntity<TierLimitsResponse> getLimits(
+            @AuthenticationPrincipal UUID userId) {
+        return ResponseEntity.ok(usageService.getTierLimits(userId));
     }
 }

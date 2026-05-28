@@ -4,6 +4,7 @@ import com.placementgo.backend.payment.dto.CreateOrderResponse;
 import com.placementgo.backend.payment.dto.SubscriptionStatusResponse;
 import com.placementgo.backend.payment.dto.VerifyPaymentRequest;
 import com.placementgo.backend.payment.entity.Subscription;
+import com.placementgo.backend.payment.enums.SubscriptionTier;
 import com.placementgo.backend.payment.repository.SubscriptionRepository;
 import com.razorpay.Order;
 import com.razorpay.RazorpayClient;
@@ -26,7 +27,6 @@ import java.util.UUID;
 @Slf4j
 public class PaymentService {
 
-    private static final int AMOUNT_PAISE = 100; // $1 in cents
     private static final int VALIDITY_DAYS = 30;
 
     @Value("${razorpay.key-id}")
@@ -42,36 +42,49 @@ public class PaymentService {
     }
 
     /** Create a Razorpay order and persist a PENDING subscription record */
-    public CreateOrderResponse createOrder(UUID userId) throws RazorpayException {
+    public CreateOrderResponse createOrder(UUID userId, String planName) throws RazorpayException {
+        SubscriptionTier tier = SubscriptionTier.fromString(planName);
+        
+        // Free tier cannot create orders
+        if (tier.isFreeTier()) {
+            throw new IllegalArgumentException("Cannot create order for free tier");
+        }
+        
         RazorpayClient client = new RazorpayClient(keyId, keySecret);
 
         JSONObject orderRequest = new JSONObject();
-        orderRequest.put("amount", AMOUNT_PAISE);
-        orderRequest.put("currency", "USD");
+        orderRequest.put("amount", tier.getPriceInCents());
+        orderRequest.put("currency", "INR");
         orderRequest.put("receipt", "sub_" + userId.toString().substring(0, 8));
         orderRequest.put("payment_capture", true);
 
         Order order = client.orders.create(orderRequest);
         String orderId = order.get("id");
-        log.info("Razorpay order created: {} for user {}", orderId, userId);
+        log.info("Razorpay order created: {} for user {} - plan {}", orderId, userId, tier.name());
 
         // Save pending subscription
         Subscription sub = Subscription.builder()
                 .userId(userId)
                 .razorpayOrderId(orderId)
-                .plan("PRO")
+                .plan(tier.name())
                 .status("PENDING")
-                .amountPaise(AMOUNT_PAISE)
+                .amountPaise(tier.getPriceInCents())
                 .build();
         subscriptionRepository.save(sub);
 
+        String description = switch (tier) {
+            case PRO -> "30-day Pro Access — 15 Resumes, 20 Job Searches, 50 Applications";
+            case ENTERPRISE -> "30-day Enterprise Access — 50 Resumes, 60 Job Searches, 200 Applications";
+            default -> "Premium Access";
+        };
+
         return CreateOrderResponse.builder()
                 .orderId(orderId)
-                .amountPaise(AMOUNT_PAISE)
-                .currency("USD")
+                .amountPaise(tier.getPriceInCents())
+                .currency("INR")
                 .keyId(keyId)
-                .planName("PlacementGO PRO")
-                .description("30-day Premium Access — Unlimited Job Auto-Apply")
+                .planName("PlacementGO " + tier.getDisplayName())
+                .description(description)
                 .build();
     }
 
@@ -97,11 +110,13 @@ public class PaymentService {
         sub.setExpiresAt(now.plus(VALIDITY_DAYS, ChronoUnit.DAYS));
         subscriptionRepository.save(sub);
 
-        log.info("Subscription ACTIVE for user {} — payment {}", userId, req.getRazorpayPaymentId());
+        log.info("Subscription ACTIVE for user {} — plan {} — payment {}", userId, sub.getPlan(), req.getRazorpayPaymentId());
+
+        SubscriptionTier tier = SubscriptionTier.fromString(sub.getPlan());
 
         return SubscriptionStatusResponse.builder()
-                .isPremium(true)
-                .plan("PRO")
+                .isPremium(!tier.isFreeTier())
+                .plan(tier.name())
                 .status("ACTIVE")
                 .activatedAt(sub.getActivatedAt())
                 .expiresAt(sub.getExpiresAt())
@@ -114,16 +129,21 @@ public class PaymentService {
 
         if (subOpt.isEmpty()) {
             return SubscriptionStatusResponse.builder()
-                    .isPremium(false).plan("FREE").status("NONE").build();
+                    .isPremium(false)
+                    .plan("STARTER")
+                    .status("NONE")
+                    .build();
         }
 
         Subscription sub = subOpt.get();
         boolean isActive = "ACTIVE".equals(sub.getStatus())
                 && (sub.getExpiresAt() == null || sub.getExpiresAt().isAfter(Instant.now()));
 
+        SubscriptionTier tier = isActive ? SubscriptionTier.fromString(sub.getPlan()) : SubscriptionTier.STARTER;
+
         return SubscriptionStatusResponse.builder()
-                .isPremium(isActive)
-                .plan(isActive ? "PRO" : "FREE")
+                .isPremium(!tier.isFreeTier())
+                .plan(tier.name())
                 .status(sub.getStatus())
                 .activatedAt(sub.getActivatedAt())
                 .expiresAt(sub.getExpiresAt())

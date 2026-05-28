@@ -67,6 +67,14 @@ razorpay:
   key-id: ${RAZORPAY_KEY_ID:rzp_test_Sc9CZ9jM42rqxI}
   key-secret: ${RAZORPAY_KEY_SECRET:3073xjbKcPnGVG089eMlAmoe}
 
+# ── Admin Panel Security ──────────────────────────────────────────────────────
+admin:
+  username: ${ADMIN_USERNAME:placementgo_admin}
+  password: ${ADMIN_PASSWORD:PG@dm!n2026#Secure}
+  jwt:
+    secret: ${ADMIN_JWT_SECRET:PlacementGoAdminJwtSecretKey2026VerySecureAndLongEnoughForHS256Algorithm}
+    expiration: ${ADMIN_JWT_EXPIRATION:28800000} # 8 hours in milliseconds
+
 # ── Auto-Apply Pipeline ───────────────────────────────────────────────────────
 autoapply:
   # Cron: every 6 hours by default.  Override: "0 0 8,14,20 * * *" for 3×/day
