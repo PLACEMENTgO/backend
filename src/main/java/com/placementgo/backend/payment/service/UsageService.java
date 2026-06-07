@@ -56,24 +56,34 @@ public class UsageService {
     }
 
     /**
-     * Check if user can generate resume and increment counter if allowed
+     * Check if user is allowed to generate a resume RIGHT NOW.
+     * This is a pure read — it does NOT increment any counter.
+     * Call {@link #recordResumeGeneration(UUID)} only after the generation actually succeeds.
      */
-    @Transactional
     public boolean canGenerateResume(UUID userId) {
         SubscriptionTier tier = getUserTier(userId);
         UsageTracking usage = getOrCreateUsageTracking(userId);
-        
+
         if (usage.getResumeGenerationsUsed() >= tier.getResumeGenerationLimit()) {
-            log.warn("User {} exceeded resume generation limit ({}/{})", 
+            log.warn("User {} exceeded resume generation limit ({}/{})",
                      userId, usage.getResumeGenerationsUsed(), tier.getResumeGenerationLimit());
             return false;
         }
-        
+        return true;
+    }
+
+    /**
+     * Increment the resume-generation counter. Call this ONLY after a successful generation
+     * so that failed/aborted runs do not consume the user's quota.
+     */
+    @Transactional
+    public void recordResumeGeneration(UUID userId) {
+        SubscriptionTier tier = getUserTier(userId);
+        UsageTracking usage = getOrCreateUsageTracking(userId);
         usage.incrementResumeGeneration();
         usageTrackingRepository.save(usage);
-        log.info("User {} generated resume ({}/{})", 
+        log.info("User {} successfully generated resume ({}/{})",
                  userId, usage.getResumeGenerationsUsed(), tier.getResumeGenerationLimit());
-        return true;
     }
 
     /**

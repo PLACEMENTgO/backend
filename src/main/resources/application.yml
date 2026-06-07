@@ -59,6 +59,10 @@ app:
 resume:
   groq:
     api-key: ${GROQ_API_KEY:}
+    # Comma-separated pool of Groq API keys for automatic rotation when one is
+    # rate-limited (HTTP 429) or exhausted (401/403). Falls back to api-key
+    # above if this is empty.
+    api-keys: ${GROQ_API_KEYS:}
     base-url: https://api.groq.com/openai/v1
     model: llama-3.3-70b-versatile
     temperature: 0.2

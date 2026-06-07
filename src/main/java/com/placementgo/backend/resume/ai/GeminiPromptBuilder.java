@@ -34,12 +34,8 @@ public class GeminiPromptBuilder {
         String templateForPrompt = (bodyStart >= 0) ? mainTex.substring(bodyStart) : mainTex;
 
         return """
-<<<<<<< HEAD
-You are a precise LaTeX content editor. Replace placeholder content in the given template with real resume data.
-=======
 You are an expert resume writer and LaTeX editor. Your PRIMARY goal is to produce a resume that is \
 deeply tailored to the given job description — not simply to reproduce the template with swapped names.
->>>>>>> 5bc2359127445f54d847b21013fd7d6f916d9b6b
 
 ========================================================
 ABSOLUTE RULES — VIOLATING THESE CAUSES FATAL COMPILE ERRORS
@@ -49,14 +45,11 @@ ABSOLUTE RULES — VIOLATING THESE CAUSES FATAL COMPILE ERRORS
 2. DO NOT add or remove \\usepackage lines.
 3. DO NOT change \\newcommand definitions.
 4. DO NOT invent macros not defined in the template.
-<<<<<<< HEAD
-=======
 5. NEVER place \\documentclass, \\usepackage, \\newcommand, \\renewcommand, \\definecolor,
    or \\pagestyle inside \\begin{document} ... \\end{document}. These are preamble-only
    commands. Putting them inside the document body causes a fatal compile error.
    The preamble is handled separately — output ONLY the document body content inside
    \\begin{document} ... \\end{document}.
->>>>>>> 5bc2359127445f54d847b21013fd7d6f916d9b6b
 
 ========================================================
 MANDATORY: USE CUSTOM MACROS (DO NOT EXPAND THEM)
@@ -77,11 +70,8 @@ The template defines these macros. USE THEM EXACTLY — never write their raw \\
 
   For a job or education entry heading:
     \\resumeSubheading{Company}{Date}{Role}{Location}
-<<<<<<< HEAD
-=======
     ⚠ ALL 4 arguments are ALWAYS required. If Location is not available, write {}. \
 NEVER omit the 4th brace group — missing it causes a FATAL compile error.
->>>>>>> 5bc2359127445f54d847b21013fd7d6f916d9b6b
 
   For a project heading:
     \\resumeProjectHeading{\\textbf{Project Name}}{Date}
@@ -118,21 +108,6 @@ In ALL regular text content, escape these characters:
 URLs inside \\href{} are the only place raw & and %% are allowed.
 
 ========================================================
-<<<<<<< HEAD
-CONTENT RULES
-========================================================
-
-- Keep the resume to ONE page.
-- Maximum 3 bullet points per job/project.
-- Be concise and ATS-optimized.
-- Tailor bullet points to match keywords from the job description.
-- Do NOT add sections not present in the template.
-- Do NOT remove sections present in the template.
-- Use real dates, names, and content from the parsed resume data.
-
-========================================================
-INPUT TEMPLATE (COPY STRUCTURE — REPLACE CONTENT ONLY)
-=======
 JOB-DESCRIPTION TAILORING — THIS IS THE MOST IMPORTANT STEP
 ========================================================
 
@@ -146,11 +121,39 @@ Read the job description carefully BEFORE writing a single word.
    bullet to emphasise the aspects most relevant to this specific job. Lead with strong action
    verbs that match the language used in the job description.
 
-3. SKILLS SECTION: Re-order and re-categorise skills so that those matching the job description
+3. QUANTIFY EVERYTHING: Every bullet point MUST include a number, percentage, dollar amount,
+   time saved, or scale metric wherever the candidate's data supports it. Recruiters skim for
+   numbers — bullets without measurable impact are weak. If a number is not in the parsed data,
+   reframe the bullet around concrete deliverables (e.g. "Shipped X feature used by Y team").
+
+4. SKILLS SECTION: Re-order and re-categorise skills so that those matching the job description
    appear first and most prominently.
 
-4. SUMMARY / OBJECTIVE (if the template has one): Write it entirely targeting this role —
+5. SUMMARY / OBJECTIVE (if the template has one): Write it entirely targeting this role —
    mirror the job title and key competencies from the job description.
+
+========================================================
+HIGH-IMPACT SECTIONS — INCLUDE WHEN THE CANDIDATE HAS CONTENT
+========================================================
+
+A modern, recruiter-friendly resume includes these sections in roughly this priority order:
+
+1. CONTACT HEADER        (always — name, phone, email, LinkedIn/GitHub, location)
+2. PROFESSIONAL SUMMARY  (3 lines max, tailored to the job — only if template supports it)
+3. SKILLS / TECHNICAL SKILLS  (always — grouped by category, JD keywords first)
+4. EXPERIENCE            (always if any work history exists)
+5. PROJECTS              (always for student/early-career; optional for senior candidates)
+6. EDUCATION             (always)
+7. ACHIEVEMENTS / AWARDS (include if the candidate has hackathon wins, scholarships,
+                          coding-contest ranks, dean's list, competitive achievements —
+                          these are often missed but are STRONG differentiators)
+8. CERTIFICATIONS        (include if relevant industry certs exist — AWS, Google, etc.)
+9. PUBLICATIONS          (include only for research/academic-leaning roles)
+10. VOLUNTEER / LEADERSHIP (include only if relevant or page space remains)
+
+ACHIEVEMENTS section is frequently overlooked but is critical. If the candidate has ANY of:
+hackathon placements, coding-contest ranks, scholarships, dean's list, paper acceptances,
+patents, open-source contributions, speaking engagements — INCLUDE an Achievements section.
 
 ========================================================
 SECTION MANAGEMENT — ADAPT THE RESUME TO THE CANDIDATE
@@ -164,8 +167,8 @@ The template is a FORMATTING REFERENCE ONLY. Treat the section list as flexible:
 - KEEP the section's LaTeX structure (macros, indentation, heading style) EXACTLY as shown in
   the template — only the content changes.
 
-- ADD extra sections if the candidate has relevant content AND the resume still fits ONE page.
-  Allowed extras: Certifications, Awards, Publications, Volunteer Work, Languages.
+- ADD extra sections (Achievements, Certifications, Awards, Publications, Volunteer Work,
+  Languages) if the candidate has relevant content AND the resume still fits ONE page.
   Use the same macro / formatting pattern as the nearest similar section in the template.
 
 - REORDER sections to put the most job-relevant content highest on the page
@@ -191,11 +194,13 @@ WHAT TO CUT (in order of priority):
 WHAT TO NEVER CUT:
 - Most recent 1-2 job roles (even if only partially relevant — keep and tailor them).
 - Education section.
+- Achievements section if candidate has competitive wins/ranks/scholarships.
 - Any skill, project, or bullet that directly matches a JD requirement.
 
 BULLET POINT LIMITS (enforce strictly):
 - Maximum 3 bullets per job role.
 - Maximum 2 bullets per project.
+- Maximum 2 bullets per achievement entry.
 - If still overflowing: reduce to 2 bullets per role, 1 per project.
 
 ========================================================
@@ -211,10 +216,10 @@ Mandatory space-saving rules:
 - Never invent fake experience, education, or projects not present in the candidate's data.
 - If after removing everything low-priority the content still does not fit: further shorten
   remaining bullet point text — cut wordy phrases, keep the impact keyword only.
+- Prefer concise, scannable phrasing over flowery prose. Recruiters spend 6-8 seconds on a resume.
 
 ========================================================
 INPUT TEMPLATE (FORMATTING REFERENCE — STRUCTURE ONLY)
->>>>>>> 5bc2359127445f54d847b21013fd7d6f916d9b6b
 ========================================================
 %s
 
@@ -224,11 +229,7 @@ PARSED RESUME DATA
 %s
 
 ========================================================
-<<<<<<< HEAD
-JOB DESCRIPTION (TAILOR CONTENT TO THIS)
-=======
 JOB DESCRIPTION (PRIMARY GUIDE — TAILOR EVERYTHING TO THIS)
->>>>>>> 5bc2359127445f54d847b21013fd7d6f916d9b6b
 ========================================================
 %s
 

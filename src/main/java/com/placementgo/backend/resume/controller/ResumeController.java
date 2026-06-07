@@ -41,13 +41,19 @@ public class ResumeController {
 
         UUID userId = (UUID) authentication.getPrincipal();
 
-        // Check if user can generate resume (tier limit check)
+        // Check if user is allowed to generate a resume (tier limit check) WITHOUT consuming
+        // their quota — the counter is only incremented after a successful generation below.
         if (!usageService.canGenerateResume(userId)) {
             return ResponseEntity.status(429).build(); // 429 Too Many Requests
         }
 
         GenerateResumeResponse response =
                 resumeService.uploadAndGenerate(userId, file, jobDescription, template);
+
+        // Only count this against the user's quota now that the resume has been generated
+        // successfully. If uploadAndGenerate() threw, the recordResumeGeneration() call is
+        // skipped and the user retains their full remaining quota.
+        usageService.recordResumeGeneration(userId);
 
         return ResponseEntity.ok(response);
     }
