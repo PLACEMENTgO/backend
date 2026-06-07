@@ -43,10 +43,14 @@ jobs:
             DISK_USED=$(df / | awk 'NR==2{gsub(/%/,"",$5); print $5}')
             echo "Disk used: ${DISK_USED}%"
             if [ "$DISK_USED" -gt 60 ]; then
-              echo "Disk above 60%, running aggressive prune..."
-              docker builder prune -f
-              docker image prune -af
-              docker system prune -f
+              echo "Disk above 60%, running aggressive prune (non-fatal)..."
+              # Don't let a concurrent/in-flight prune ("prune operation is already running")
+              # or any other prune hiccup abort the whole deploy (set -e is on).
+              docker builder prune -f       || echo "WARN: docker builder prune failed (continuing)"
+              docker image prune -af        || echo "WARN: docker image prune failed (continuing)"
+              docker system prune -f        || echo "WARN: docker system prune failed (continuing)"
+              # Re-report disk after prune
+              df -h / | awk 'NR<=2'
             fi
 
             echo "==> Rebuilding backend container..."
